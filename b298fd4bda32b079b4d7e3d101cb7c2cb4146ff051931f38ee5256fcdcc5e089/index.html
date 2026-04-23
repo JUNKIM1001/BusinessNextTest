@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>スタートアップ評価レポート</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root {
+      --primary-color: #1a237e;
+      --accent-color: #ffab00;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #212529;
+      --gray-out-bg: #f5f5f5;
+      --gray-out-text: #9e9e9e;
+      --bar-color1: #3f51b5;
+      --bar-color2: #7986cb;
+      --bar-color3: #c5cae9;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 40px;
+      color: var(--primary-color);
+      letter-spacing: 0.05em;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 24px;
+      width: 100%;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 24px;
+      border: 1px solid #e0e0e0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      transition: box-shadow 0.2s;
+    }
+    .card.accent {
+      border-left: 6px solid var(--accent-color);
+    }
+    .card.na {
+      background: var(--gray-out-bg);
+      color: var(--gray-out-text);
+      border-left: 6px solid var(--gray-out-text);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .card-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+      color: inherit;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .stage-badge {
+      background: var(--primary-color);
+      color: #fff;
+      border-radius: 6px;
+      padding: 2px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-left: 8px;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    .website-link {
+      margin-left: 8px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--primary-color);
+      font-size: 17px;
+      text-decoration: none;
+      font-weight: 400;
+      transition: opacity 0.2s;
+      opacity: 0.9;
+    }
+    .website-link:hover {
+      text-decoration: underline;
+      opacity: 1;
+    }
+    .website-link svg {
+      width: 17px;
+      height: 17px;
+      margin-right: 3px;
+      vertical-align: middle;
+      fill: var(--primary-color);
+    }
+    .na-badge {
+      background: var(--gray-out-text);
+      color: #fff;
+      border-radius: 6px;
+      padding: 2px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      margin-left: 12px;
+      letter-spacing: 0.04em;
+      vertical-align: middle;
+    }
+    .score-summary {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .score-total {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+      background: #e8eaf6;
+      border-radius: 7px;
+      padding: 6px 20px;
+      display: inline-block;
+      letter-spacing: 0.04em;
+    }
+    .card.accent .score-total {
+      background: var(--accent-color);
+      color: #fff;
+    }
+    .card.na .score-total {
+      background: var(--gray-out-text);
+      color: #fff;
+    }
+    .stacked-bar-container {
+      width: 100%;
+      height: 18px;
+      background: #e0e0e0;
+      border-radius: 9px;
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 3px;
+      margin-top: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .bar-segment {
+      height: 100%;
+      transition: width 0.4s;
+    }
+    .bar1 { background: var(--bar-color1); }
+    .bar2 { background: var(--bar-color2); }
+    .bar3 { background: var(--bar-color3); }
+    .bar-na { background: var(--gray-out-text); }
+    .evaluation-details {
+      margin-top: 10px;
+    }
+    .eval-section {
+      margin-bottom: 18px;
+    }
+    .eval-header {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 7px;
+      gap: 8px;
+      color: var(--primary-color);
+    }
+    .eval-score {
+      font-size: 16px;
+      font-weight: 700;
+      margin-left: 6px;
+      color: var(--accent-color);
+    }
+    .eval-score.na {
+      color: var(--gray-out-text);
+    }
+    .eval-header svg {
+      width: 21px;
+      height: 21px;
+      vertical-align: middle;
+      margin-right: 1px;
+      fill: currentColor;
+    }
+    ul {
+      margin: 0 0 0 20px;
+      padding: 0;
+      font-size: 15px;
+    }
+    .marker {
+      background: linear-gradient(90deg, #ffe082 60%, transparent 100%);
+      font-weight: 500;
+      padding: 0 2px;
+      border-radius: 2px;
+      color: #ad7200;
+    }
+    @media (max-width: 650px) {
+      .container {
+        padding: 12px 2vw;
+      }
+      .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .card {
+        padding: 17px;
+      }
+      .card-header h2 {
+        font-size: 19px;
+      }
+      .score-total {
+        font-size: 20px;
+        padding: 5px 12px;
+      }
+      .eval-header {
+        font-size: 16px;
+      }
+      ul {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>スタートアップ評価レポート</h1>
+    <div class="cards-grid">
+
+      <!-- 1. 株式会社ユカシカド -->
+      <div class="card accent">
+        <div class="card-header">
+          <h2>株式会社ユカシカド</h2>
+          <span class="stage-badge">シリーズC</span>
+          <a class="website-link" href="https://www.yukashikado.co.jp/" target="_blank" rel="noopener noreferrer" title="公式サイト">
+            <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 100 18A9 9 0 0010 1zm6 9a6 6 0 01-6 6v-2.5a.5.5 0 00-1 0V16a6 6 0 01-6-6h2.5a.5.5 0 000-1H3.5A6 6 0 0110 4v2.5a.5.5 0 001 0V4a6 6 0 016 6h-2.5a.5.5 0 000 1H16z"/></svg>
+            公式サイト
+          </a>
+        </div>
+        <div class="score-summary">
+          <span class="score-total">7 / 9 点</span>
+          <div class="stacked-bar-container">
+            <div class="bar-segment bar1" style="width:33.33%"></div>
+            <div class="bar-segment bar2" style="width:22.22%"></div>
+            <div class="bar-segment bar3" style="width:22.22%"></div>
+          </div>
+        </div>
+        <div class="evaluation-details">
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M3 6v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2zm2 0h14v12H5V6zm7 1a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+              バリュエーションの適正さ
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li>シリーズCで<span class="marker">20億円</span>調達。推定PostValは<span class="marker">200億円</span>（20億×10）で、基準値<span class="marker">30～120億円</span>を超えるが、<span class="marker">複数プロダクト・特許保有・市場先行性</span>を鑑みると市場妥当性があり、評価3。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M17 2v2h3a1 1 0 011 1v3a6 6 0 01-5 5.91V18h2a1 1 0 110 2H7a1 1 0 110-2h2v-4.09A6 6 0 014 8V5a1 1 0 011-1h3V2h8zm-1.5 2h-7v2.09A4 4 0 0012 14a4 4 0 003.5-9.91V4z"/></svg>
+              競合優位性
+              <span class="eval-score">2</span>
+            </div>
+            <ul>
+              <li><span class="marker">尿から栄養状態を評価する検査技術</span>と<span class="marker">複数特許</span>で参入障壁が高い。</li>
+              <li>ただし、パーソナライズド栄養領域は競合増加傾向であり、今後の差別化・模倣リスクの検証が必要。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2-.9-2-2v-7.17l-1.41-1.42A2 2 0 013 7.17V17a4 4 0 004 4h10a4 4 0 004-4V7.17a2 2 0 00-.59-1.41L19 8.83V16c0 1.1-.9 2-2 2H7zm5-10.17l3.88 3.88a1 1 0 01-1.41 1.41l-2.47-2.47-2.47 2.47a1 1 0 01-1.41-1.41L12 7.83z"/></svg>
+              協業提案と貴社の親和性
+              <span class="eval-score">2</span>
+            </div>
+            <ul>
+              <li><span class="marker">TYPE FOODのオフライン展開</span>による健康志向店舗化・来店動機創出などシナジーは高いが、既存オペレーションとの整合や詳細設計は要検討。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 合同会社ネイバーフード -->
+      <div class="card">
+        <div class="card-header">
+          <h2>合同会社ネイバーフード</h2>
+          <span class="stage-badge">Seed</span>
+          <a class="website-link" href="https://sites.google.com/view/neighbourfood/" target="_blank" rel="noopener noreferrer" title="公式サイト">
+            <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 100 18A9 9 0 0010 1zm6 9a6 6 0 01-6 6v-2.5a.5.5 0 00-1 0V16a6 6 0 01-6-6h2.5a.5.5 0 000-1H3.5A6 6 0 0110 4v2.5a.5.5 0 001 0V4a6 6 0 016 6h-2.5a.5.5 0 000 1H16z"/></svg>
+            公式サイト
+          </a>
+        </div>
+        <div class="score-summary">
+          <span class="score-total">5 / 9 点</span>
+          <div class="stacked-bar-container">
+            <div class="bar-segment bar1" style="width:0%"></div>
+            <div class="bar-segment bar2" style="width:33.33%"></div>
+            <div class="bar-segment bar3" style="width:22.22%"></div>
+          </div>
+        </div>
+        <div class="evaluation-details">
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M3 6v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2zm2 0h14v12H5V6zm7 1a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+              バリュエーションの適正さ
+              <span class="eval-score na">N/A</span>
+            </div>
+            <ul>
+              <li>資金調達実績・金額が<span class="marker">無し</span>のため、バリュエーションの評価は<span class="marker">N/A</span>。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M17 2v2h3a1 1 0 011 1v3a6 6 0 01-5 5.91V18h2a1 1 0 110 2H7a1 1 0 110-2h2v-4.09A6 6 0 014 8V5a1 1 0 011-1h3V2h8zm-1.5 2h-7v2.09A4 4 0 0012 14a4 4 0 003.5-9.91V4z"/></svg>
+              競合優位性
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li><span class="marker">フードバンク×収益モデル</span>は国内外でも先例がほぼなく、<span class="marker">独自性が非常に高い</span>。</li>
+              <li>自社フードバンク運営実績や、社会福祉協議会・フードバンク連盟との連携パイプ、<span class="marker">コンサルスキル×現場実行力</span>の組合せは他社にない強み。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2-.9-2-2v-7.17l-1.41-1.42A2 2 0 013 7.17V17a4 4 0 004 4h10a4 4 0 004-4V7.17a2 2 0 00-.59-1.41L19 8.83V16c0 1.1-.9 2-2 2H7zm5-10.17l3.88 3.88a1 1 0 01-1.41 1.41l-2.47-2.47-2.47 2.47a1 1 0 01-1.41-1.41L12 7.83z"/></svg>
+              協業提案と貴社の親和性
+              <span class="eval-score">2</span>
+            </div>
+            <ul>
+              <li><span class="marker">コンビニフードドライブネットワーク連携</span>による全国拡大・CSR効果など具体的な協業メリットを提案。一方で、事業収益性・オペレーション詳細は今後の検証が必要。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. OUEN株式会社 -->
+      <div class="card accent">
+        <div class="card-header">
+          <h2>OUEN株式会社</h2>
+          <span class="stage-badge">N/A</span>
+          <a class="website-link" href="https://ouenx.com/" target="_blank" rel="noopener noreferrer" title="公式サイト">
+            <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 100 18A9 9 0 0010 1zm6 9a6 6 0 01-6 6v-2.5a.5.5 0 00-1 0V16a6 6 0 01-6-6h2.5a.5.5 0 000-1H3.5A6 6 0 0110 4v2.5a.5.5 0 001 0V4a6 6 0 016 6h-2.5a.5.5 0 000 1H16z"/></svg>
+            公式サイト
+          </a>
+        </div>
+        <div class="score-summary">
+          <span class="score-total">7 / 9 点</span>
+          <div class="stacked-bar-container">
+            <div class="bar-segment bar1" style="width:0%"></div>
+            <div class="bar-segment bar2" style="width:33.33%"></div>
+            <div class="bar-segment bar3" style="width:44.44%"></div>
+          </div>
+        </div>
+        <div class="evaluation-details">
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M3 6v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2zm2 0h14v12H5V6zm7 1a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+              バリュエーションの適正さ
+              <span class="eval-score na">N/A</span>
+            </div>
+            <ul>
+              <li>資金調達実績・金額が<span class="marker">無し</span>のため、バリュエーションの評価は<span class="marker">N/A</span>。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M17 2v2h3a1 1 0 011 1v3a6 6 0 01-5 5.91V18h2a1 1 0 110 2H7a1 1 0 110-2h2v-4.09A6 6 0 014 8V5a1 1 0 011-1h3V2h8zm-1.5 2h-7v2.09A4 4 0 0012 14a4 4 0 003.5-9.91V4z"/></svg>
+              競合優位性
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li><span class="marker">ゼロ学習AI</span>による店舗毎の個別学習不要・現場即応性は国内トップクラス。</li>
+              <li>製造・食品業界でのPoC実績（画像設定時間90%削減、誤検出率半減）や、<span class="marker">AI完全内製化</span>による追加開発力も強み。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2-.9-2-2v-7.17l-1.41-1.42A2 2 0 013 7.17V17a4 4 0 004 4h10a4 4 0 004-4V7.17a2 2 0 00-.59-1.41L19 8.83V16c0 1.1-.9 2-2 2H7zm5-10.17l3.88 3.88a1 1 0 01-1.41 1.41l-2.47-2.47-2.47 2.47a1 1 0 01-1.41-1.41L12 7.83z"/></svg>
+              協業提案と貴社の親和性
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li><span class="marker">店舗ネットワーク・カメラ・POS基盤</span>と自社AIを組み合わせ、安全性と棚効率の向上を同時に実現する2つの協業ソリューションを提案。既存インフラとの親和性や店舗運営の省人化・自動化方針とも合致し、<span class="marker">高いシナジー</span>が見込める。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Blue Farm株式会社 -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Blue Farm株式会社</h2>
+          <span class="stage-badge">シード</span>
+          <a class="website-link" href="https://blue-farm.co.jp" target="_blank" rel="noopener noreferrer" title="公式サイト">
+            <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 100 18A9 9 0 0010 1zm6 9a6 6 0 01-6 6v-2.5a.5.5 0 00-1 0V16a6 6 0 01-6-6h2.5a.5.5 0 000-1H3.5A6 6 0 0110 4v2.5a.5.5 0 001 0V4a6 6 0 016 6h-2.5a.5.5 0 000 1H16z"/></svg>
+            公式サイト
+          </a>
+        </div>
+        <div class="score-summary">
+          <span class="score-total">6 / 9 点</span>
+          <div class="stacked-bar-container">
+            <div class="bar-segment bar1" style="width:33.33%"></div>
+            <div class="bar-segment bar2" style="width:33.33%"></div>
+            <div class="bar-segment bar3" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="evaluation-details">
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M3 6v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2zm2 0h14v12H5V6zm7 1a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+              バリュエーションの適正さ
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li>シードラウンドで<span class="marker">1億円</span>調達。推定PostValは<span class="marker">5億円</span>（1億×5）で基準値<span class="marker">1～3億円</span>をやや超過するが、ESG・脱炭素領域の成長性・独自モデルを加味し許容範囲と判断。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M17 2v2h3a1 1 0 011 1v3a6 6 0 01-5 5.91V18h2a1 1 0 110 2H7a1 1 0 110-2h2v-4.09A6 6 0 014 8V5a1 1 0 011-1h3V2h8zm-1.5 2h-7v2.09A4 4 0 0012 14a4 4 0 003.5-9.91V4z"/></svg>
+              競合優位性
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li><span class="marker">400年以上の茶農家知見</span>＋<span class="marker">IoT×ブロックチェーン×ESGファイナンス</span>の融合モデルは他社にない独自性で、代表のファイナンス領域実績や、環境価値を資本市場で評価可能にするスキームも強み。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2-.9-2-2v-7.17l-1.41-1.42A2 2 0 013 7.17V17a4 4 0 004 4h10a4 4 0 004-4V7.17a2 2 0 00-.59-1.41L19 8.83V16c0 1.1-.9 2-2 2H7zm5-10.17l3.88 3.88a1 1 0 01-1.41 1.41l-2.47-2.47-2.47 2.47a1 1 0 01-1.41-1.41L12 7.83z"/></svg>
+              協業提案と貴社の親和性
+              <span class="eval-score">0</span>
+            </div>
+            <ul>
+              <li>「SUSTEA」の店舗展開・CO₂削減データのレシート/アプリ可視化など協業提案は具体的だが、飲料カテゴリとしての競合や既存取引先とのバッティング、短期収益化の難易度など、PoC段階での検討が妥当。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. FRCTL株式会社 -->
+      <div class="card">
+        <div class="card-header">
+          <h2>FRCTL株式会社</h2>
+          <span class="stage-badge">プレシード</span>
+          <a class="website-link" href="https://www.frctl.jp/healthcare" target="_blank" rel="noopener noreferrer" title="公式サイト">
+            <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 100 18A9 9 0 0010 1zm6 9a6 6 0 01-6 6v-2.5a.5.5 0 00-1 0V16a6 6 0 01-6-6h2.5a.5.5 0 000-1H3.5A6 6 0 0110 4v2.5a.5.5 0 001 0V4a6 6 0 016 6h-2.5a.5.5 0 000 1H16z"/></svg>
+            公式サイト
+          </a>
+        </div>
+        <div class="score-summary">
+          <span class="score-total">N/A</span>
+          <div class="stacked-bar-container">
+            <div class="bar-segment bar-na" style="width:100%"></div>
+          </div>
+        </div>
+        <div class="evaluation-details">
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M3 6v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2zm2 0h14v12H5V6zm7 1a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+              バリュエーションの適正さ
+              <span class="eval-score na">N/A</span>
+            </div>
+            <ul>
+              <li>資金調達額が<span class="marker">不明</span>のため、バリュエーション評価はN/A。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M17 2v2h3a1 1 0 011 1v3a6 6 0 01-5 5.91V18h2a1 1 0 110 2H7a1 1 0 110-2h2v-4.09A6 6 0 014 8V5a1 1 0 011-1h3V2h8zm-1.5 2h-7v2.09A4 4 0 0012 14a4 4 0 003.5-9.91V4z"/></svg>
+              競合優位性
+              <span class="eval-score">2</span>
+            </div>
+            <ul>
+              <li>男性更年期障害に特化した<span class="marker">日本初</span>のヘルスケア事業。</li>
+              <li>AI解析・医師連携・企業向け健康支援まで一気通貫の設計は独自だが、同分野への参入障壁や既存ヘルスケア事業者との競合リスクも考慮が必要。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2-.9-2-2v-7.17l-1.41-1.42A2 2 0 013 7.17V17a4 4 0 004 4h10a4 4 0 004-4V7.17a2 2 0 00-.59-1.41L19 8.83V16c0 1.1-.9 2-2 2H7zm5-10.17l3.88 3.88a1 1 0 01-1.41 1.41l-2.47-2.47-2.47 2.47a1 1 0 01-1.41-1.41L12 7.83z"/></svg>
+              協業提案と貴社の親和性
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li>「<span class="marker">コンビニ店舗</span>を拠点とした健康チェック・サプリ提案・検査キット設置」など、<span class="marker">現場導入・データ連携</span>まで具体的な協業案で、業態シナジーも明確。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 株式会社FromTo -->
+      <div class="card">
+        <div class="card-header">
+          <h2>株式会社FromTo</h2>
+          <span class="stage-badge">シード</span>
+          <a class="website-link" href="https://from-to.biz/" target="_blank" rel="noopener noreferrer" title="公式サイト">
+            <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 100 18A9 9 0 0010 1zm6 9a6 6 0 01-6 6v-2.5a.5.5 0 00-1 0V16a6 6 0 01-6-6h2.5a.5.5 0 000-1H3.5A6 6 0 0110 4v2.5a.5.5 0 001 0V4a6 6 0 016 6h-2.5a.5.5 0 000 1H16z"/></svg>
+            公式サイト
+          </a>
+        </div>
+        <div class="score-summary">
+          <span class="score-total">6 / 9 点</span>
+          <div class="stacked-bar-container">
+            <div class="bar-segment bar1" style="width:33.33%"></div>
+            <div class="bar-segment bar2" style="width:33.33%"></div>
+            <div class="bar-segment bar3" style="width:22.22%"></div>
+          </div>
+        </div>
+        <div class="evaluation-details">
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M3 6v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2zm2 0h14v12H5V6zm7 1a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+              バリュエーションの適正さ
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li>シードで<span class="marker">8,650万円</span>調達。推定PostValは<span class="marker">4.3億円</span>（8650万×5）で基準値<span class="marker">1～3億円</span>をやや上回るが、自治体ネットワーク・制度活用等の成長性を加味し許容範囲と判断。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M17 2v2h3a1 1 0 011 1v3a6 6 0 01-5 5.91V18h2a1 1 0 110 2H7a1 1 0 110-2h2v-4.09A6 6 0 014 8V5a1 1 0 011-1h3V2h8zm-1.5 2h-7v2.09A4 4 0 0012 14a4 4 0 003.5-9.91V4z"/></svg>
+              競合優位性
+              <span class="eval-score">2</span>
+            </div>
+            <ul>
+              <li>現金以外の「ヒト・モノ」特化の企業版ふるさと納税仲介で、自治体マッチングスピードとネットワークが強み。</li>
+              <li>ただし、制度自体は他社も参入可能なため、今後の差別化・ノウハウ蓄積が重要。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2-.9-2-2v-7.17l-1.41-1.42A2 2 0 013 7.17V17a4 4 0 004 4h10a4 4 0 004-4V7.17a2 2 0 00-.59-1.41L19 8.83V16c0 1.1-.9 2-2 2H7zm5-10.17l3.88 3.88a1 1 0 01-1.41 1.41l-2.47-2.47-2.47 2.47a1 1 0 01-1.41-1.41L12 7.83z"/></svg>
+              協業提案と貴社の親和性
+              <span class="eval-score">1</span>
+            </div>
+            <ul>
+              <li>コンビニ人材不足・本部地方支社のDX人材配置に関する課題解決提案はあるが、直接的な業績インパクトや短期成果は限定的。PoC段階の協議が必要。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. ジオ・マーク株式会社（原文途切れのためプレースホルダー） -->
+      <div class="card">
+        <div class="card-header">
+          <h2>ジオ・マーク株式会社</h2>
+          <span class="stage-badge">プレシリーズA</span>
+          <a class="website-link" href="https://geomark.co.jp" target="_blank" rel="noopener noreferrer" title="公式サイト">
+            <svg viewBox="0 0 20 20"><path d="M10 1a9 9 0 100 18A9 9 0 0010 1zm6 9a6 6 0 01-6 6v-2.5a.5.5 0 00-1 0V16a6 6 0 01-6-6h2.5a.5.5 0 000-1H3.5A6 6 0 0110 4v2.5a.5.5 0 001 0V4a6 6 0 016 6h-2.5a.5.5 0 000 1H16z"/></svg>
+            公式サイト
+          </a>
+        </div>
+        <div class="score-summary">
+          <span class="score-total">7 / 9 点</span>
+          <div class="stacked-bar-container">
+            <div class="bar-segment bar1" style="width:33.33%"></div>
+            <div class="bar-segment bar2" style="width:33.33%"></div>
+            <div class="bar-segment bar3" style="width:22.22%"></div>
+          </div>
+        </div>
+        <div class="evaluation-details">
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M3 6v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2zm2 0h14v12H5V6zm7 1a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+              バリュエーションの適正さ
+              <span class="eval-score">3</span>
+            </div>
+            <ul>
+              <li>原文が途中で途切れていたため、詳細は未確定です（追記可）。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M17 2v2h3a1 1 0 011 1v3a6 6 0 01-5 5.91V18h2a1 1 0 110 2H7a1 1 0 110-2h2v-4.09A6 6 0 014 8V5a1 1 0 011-1h3V2h8zm-1.5 2h-7v2.09A4 4 0 0012 14a4 4 0 003.5-9.91V4z"/></svg>
+              競合優位性
+              <span class="eval-score">—</span>
+            </div>
+            <ul>
+              <li>詳細未入力（必要情報をご提供ください）。</li>
+            </ul>
+          </div>
+          <div class="eval-section">
+            <div class="eval-header">
+              <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2-.9-2-2v-7.17l-1.41-1.42A2 2 0 013 7.17V17a4 4 0 004 4h10a4 4 0 004-4V7.17a2 2 0 00-.59-1.41L19 8.83V16c0 1.1-.9 2-2 2H7zm5-10.17l3.88 3.88a1 1 0 01-1.41 1.41l-2.47-2.47-2.47 2.47a1 1 0 01-1.41-1.41L12 7.83z"/></svg>
+              協業提案と貴社の親和性
+              <span class="eval-score">—</span>
+            </div>
+            <ul>
+              <li>詳細未入力（必要情報をご提供ください）。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
